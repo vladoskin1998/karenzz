@@ -1,11 +1,12 @@
 import Balance from './balance.model.js'
 import mongoose from 'mongoose';
+import { NEW_USER, BALANCE_NEGATIVE } from '../config/config.js'
 
 class TransactionService {
 
     async getBalance({ id }) {
         const balance = await Balance.findById(id)
-        return balance.balance
+        return { money: balance.balance }
     }
 
     async getHistory({ id }) {
@@ -26,26 +27,22 @@ class TransactionService {
 
 
         const balance = await Balance.findById(id)
-    
 
-        if (!balance) {
-            const newBalance = await new Balance({
-                balance: Number(money),
-                history: [{ transaction: Number(money) }]
-            })
-            await newBalance.save()
-            return "NEW USER"
-        }
-
-        if (balance.balance + money < 0) {
+        if (balance && Number(balance.balance) + money < 0) {
             return 'Balance is negative'
         }
 
-        await balance.updateOne(
-            { $inc: { balance: Number(money) }, $push: { history: { transaction: Number(money) } } }
+        if (!balance && money < 0) {
+            return 'New user can`t have negative balance'
+        }
+
+        const updateBalance = await Balance.findOneAndUpdate(
+            { _id: id },
+            { $inc: { balance: money }, $push: { history: { transaction: money } } },
+            { new: true, upsert: true }
         )
 
-        return "OK"
+        return updateBalance
     }
 
 
@@ -54,15 +51,15 @@ class TransactionService {
         console.log(idFrom, idTo, money);
 
 
-        const negativeMoney = await this.changeBalance({ id: idFrom, money: money * -1 })
+        const balanceFrom = await this.changeBalance({ id: idFrom, money: money * -1 })
 
-        if (negativeMoney !== 'OK') {
-            return negativeMoney
+        if (typeof balanceFrom === 'string') {
+            return balanceFrom
         }
 
-        await this.changeBalance({ id: idTo, money })
+        const balanceTo = await this.changeBalance({ id: idTo, money })
 
-        return 'OK'
+        return {balanceFrom, balanceTo}
 
     }
 }
