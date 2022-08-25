@@ -3,6 +3,6 @@ import TransactionRouter from './transaction/transaction.router.js';
 
 const router = new Router();
 
-router.use('transaction', TransactionRouter)
+router.use('/transaction', TransactionRouter)
 
 export default router
