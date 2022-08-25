@@ -3,12 +3,12 @@ import mongoose from 'mongoose';
 
 class TransactionService {
 
-    async getBalance({id}) {
+    async getBalance({ id }) {
         const balance = await Balance.findById(id)
         return balance.balance
     }
 
-    async getHistory({id}) {
+    async getHistory({ id }) {
         const balance = await Balance.findById(id)
         return balance.history
     }
@@ -16,47 +16,51 @@ class TransactionService {
 
     async changeBalance({ id, money }) {
 
+        console.log("changeBalance---->", id, money);
+
+
         if (!mongoose.Types.ObjectId.isValid(id)) {
             return 'NOT VALID TOKEN'
         }
 
-        console.log(id, money);
+
 
         const balance = await Balance.findById(id)
-        const moneyNumber = Number(money)
+    
 
         if (!balance) {
             const newBalance = await new Balance({
-                balance: moneyNumber,
-                history: [{transaction: moneyNumber}]
+                balance: Number(money),
+                history: [{ transaction: Number(money) }]
             })
             await newBalance.save()
             return "NEW USER"
         }
 
-        if(balance.balance + sum < 0){
+        if (balance.balance + money < 0) {
             return 'Balance is negative'
         }
 
         await balance.updateOne(
-            {  $inc: {balance: moneyNumber}, $push: { history: {transaction: moneyNumber} }}
+            { $inc: { balance: Number(money) }, $push: { history: { transaction: Number(money) } } }
         )
 
         return "OK"
     }
 
 
-    async remittance({idFrom, idTo, money}) {
+    async remittance({ idFrom, idTo, money }) {
 
-        const moneyNumber = Number(money)
-        
-        const negativeMoney = await this.changeBalance(idFrom, moneyNumber)
+        console.log(idFrom, idTo, money);
 
-        if(negativeMoney !== 'OK'){
+
+        const negativeMoney = await this.changeBalance({ id: idFrom, money: money * -1 })
+
+        if (negativeMoney !== 'OK') {
             return negativeMoney
         }
-        
-        await this.changeBalance(idTo, moneyNumber)
+
+        await this.changeBalance({ id: idTo, money })
 
         return 'OK'
 

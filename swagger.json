@@ -86,7 +86,7 @@
                 "type": "object",
                 "items": {
                   "id": "string",
-                  "sum": "integer"
+                  "money": "integer"
                 }
               },
               "description": "id пользователя"
