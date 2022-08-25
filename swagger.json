@@ -1,132 +1,187 @@
-
-
-
-  {
-    "swagger": "2.0",
-    "info": {
-      "version": "1.0.0",
-      "title": "Transaction",
-      "description": "Transaction"
-    },
-    "host": "localhost:5000",
-    "basePath": "/",
-    "tags": [
-      {
-        "name": "Transaction",
-        "description": "API Transaction"
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "Transaction",
+    "description": "Transaction"
+  },
+  "host": "localhost:5000",
+  "basePath": "/",
+  "tags": [
+    {
+      "name": "Transaction",
+      "description": "API Transaction"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/api/transaction/get-balance?id": {
+      "get": {
+        "tags": [
+          "Transaction"
+        ],
+        "description": "Метод получения текущего баланса пользователя. Принимает id пользователя.",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "id пользователя"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
       }
-    ],
-    "schemes": [
-      "http"
-    ],
-    "consumes": [
-      "application/json"
-    ],
-    "produces": [
-      "application/json"
-    ],
-    "paths": {
-      "/api/transaction/get-balance?id":{
-        "get":{
-          "tags":["Transaction"],
-          "description": "Метод получения текущего баланса пользователя. Принимает id пользователя.",
-          "parameters":[
-            {
-              "in":"query",
-              "name": "id",
-              "schema": {
-                "type": "string"
-              },
-              "description": "id пользователя"
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "OK",
-              "schema": {
-                "$ref": "#/definitions/balance"
+    },
+    "/api/transaction/get-history?id": {
+      "get": {
+        "tags": [
+          "Transaction"
+        ],
+        "description": "Метод получения списка транзакций. Принимает id пользователя.",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "id пользователя"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "properties": {
+                "$ref": "#/definitions/history"
               }
             }
           }
         }
-      },
-      "/api/transaction/get-history?id":{
-        "get":{
-          "tags":["Transaction"],
-          "description": "Метод получения списка транзакций. Принимает id пользователя.",
-          "parameters":[
-            {
-              "in":"query",
-              "name": "id",
-              "schema": {
-                "type": "string"
-              },
-              "description": "id пользователя"
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "OK",
-              "schema": {
-                "$ref": "#/definitions/balance"
-              }
-            }
-          }
-        }
-      },
-      "/api/transaction/change-balance":{
-        "post":{
-          "tags":["Transaction"],
-          "description": "Метод списания/начисления средств с баланса. Принимает id пользователя и сколько средств зачислить.",
-          "parameters":[
-            {
-              "in":"body",
-              "name": "change-balance",
-              "schema": {
-                "type": "object",
-                "items": {
-                  "id": "string",
-                  "money": "integer"
-                }
-              },
-              "description": "id пользователя"
-            }
-          ],
-          "produces": [
-            "application/json"
-          ],
-          "responses": {
-            "200": {
-              "description": "OK",
-              "schema": {
-                "$ref": "#/definitions/balance"
-              }
-            }
-          }
-        }
-      },
-  
-  
-    "definitions": {
-      "balance":{
-        "properties":{
-          "balance": "integer",
-          "currency": "string",
-          "history": {
-            "type": "array",
-            "items":{
+      }
+    },
+    "/api/transaction/change-balance": {
+      "post": {
+        "tags": [
+          "Transaction"
+        ],
+        "description": "Метод списания/начисления средств с баланса. Принимает id пользователя и сколько средств зачислить.",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "change-balance",
+            "schema": {
               "type": "object",
-              "date": "string",
-              "balance": "integer"
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "example": "6307774215ae4ca1d6e0ef75"
+                },
+                "money": {
+                  "type": "integer",
+                  "example": 30
+                }
+              }
+            },
+            "description": "id пользователя"
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/balance"
             }
+          }
+        }
+      }
+    },
+    "/api/transaction/remittance": {
+      "post": {
+        "tags": [
+          "Transaction"
+        ],
+        "description": "Метод перевода средств от пользователя к пользователю.",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "remittance",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "idFrom": {
+                  "type": "string",
+                  "example": "6307774215ae4ca1d6e0ef75"
+                },
+                "idTo": {
+                  "type": "string",
+                  "example": "6307774215ae4ca1d6e0ef75"
+                },
+                "money": {
+                  "type": "integer",
+                  "example": 30
+                }
+              }
+            },
+            "description": "id пользователя"
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
           }
         }
       }
     }
+  },
+  "definitions": {
+    "balance": {
+      "type": "object",
+      "properties": {
+        "balance": {
+          "type": "integer",
+          "example": 30
+        },
+        "currency": {
+          "type": "string",
+          "example": "USD"
+        },
+        "history": {
+          "type": "array",
+          "$ref": "#/definitions/history"
+        }
+      }
+    },
+    "history": {
+      "type": "object",
+      "properties": {
+        "date": {
+          "type": "string",
+          "example": "2022-08-25T13:20:45.725+00:00"
+        },
+        "balance": {
+          "type": "integer",
+          "example": 30
+        }
+      }
+    }
   }
-  }  
-
-
-
-
-
+}
