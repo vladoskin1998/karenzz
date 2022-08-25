@@ -6,25 +6,25 @@ class TransactionService {
 
     async getBalance({ id }) {
         const balance = await Balance.findById(id)
-        return { money: balance.balance }
+
+        if (!balance) {
+            return 'Balance not found!'
+        }
+        return { money: balance?.balance }
     }
 
     async getHistory({ id }) {
         const balance = await Balance.findById(id)
-        return balance.history
+
+        if (!balance) {
+            return 'Balance not found!'
+        }
+
+        return balance?.history
     }
 
 
     async changeBalance({ id, money }) {
-
-        console.log("changeBalance---->", id, money);
-
-
-        if (!mongoose.Types.ObjectId.isValid(id)) {
-            return 'NOT VALID TOKEN'
-        }
-
-
 
         const balance = await Balance.findById(id)
 
@@ -47,9 +47,6 @@ class TransactionService {
 
 
     async remittance({ idFrom, idTo, money }) {
-
-        console.log(idFrom, idTo, money);
-
 
         const balanceFrom = await this.changeBalance({ id: idFrom, money: money * -1 })
 

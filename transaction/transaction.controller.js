@@ -1,10 +1,8 @@
-// const { checkSchema, validationResult } = require('express-validator');
 import TransactionService from './transaction.service.js';
 
 class TransactionController {
 
     async getBalance(req, res) {
-        console.log(req);
         const balance = await TransactionService.getBalance(req.query)
         return res.json(balance)
     }
