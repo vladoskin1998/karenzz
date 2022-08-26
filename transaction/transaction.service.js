@@ -1,6 +1,6 @@
 import Balance from './balance.model.js'
-import mongoose from 'mongoose';
 import { NEW_USER, BALANCE_NEGATIVE } from '../config/config.js'
+import ApiError from '../errors/api.erros.js'
 
 class TransactionService {
 
@@ -8,8 +8,9 @@ class TransactionService {
         const balance = await Balance.findById(id)
 
         if (!balance) {
-            return 'Balance not found!'
+            throw ApiError.badRequest('Balance not found!', 400)
         }
+
         return { money: balance?.balance }
     }
 
@@ -17,7 +18,7 @@ class TransactionService {
         const balance = await Balance.findById(id)
 
         if (!balance) {
-            return 'Balance not found!'
+            throw ApiError.badRequest('History not found!', 400)
         }
 
         return balance?.history
@@ -29,11 +30,11 @@ class TransactionService {
         const balance = await Balance.findById(id)
 
         if (balance && Number(balance.balance) + money < 0) {
-            return 'Balance is negative'
+            throw ApiError.badRequest('Balance is negative', 400)
         }
 
         if (!balance && money < 0) {
-            return 'New user can`t have negative balance'
+            throw ApiError.badRequest('New user can`t have negative balance', 400)
         }
 
         const updateBalance = await Balance.findOneAndUpdate(
@@ -50,13 +51,9 @@ class TransactionService {
 
         const balanceFrom = await this.changeBalance({ id: idFrom, money: money * -1 })
 
-        if (typeof balanceFrom === 'string') {
-            return balanceFrom
-        }
-
         const balanceTo = await this.changeBalance({ id: idTo, money })
 
-        return {balanceFrom, balanceTo}
+        return { balanceFrom, balanceTo }
 
     }
 }
