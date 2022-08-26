@@ -1,5 +1,5 @@
 import Balance from './balance.model.js'
-import { NEW_USER, BALANCE_NEGATIVE } from '../config/config.js'
+import { BALANCE_NOT_FOUND, HISTORY_NOT_FOUND, BALANCE_NEGATIVE, NEW_USER_NEGATIVE } from '../config/config.js'
 import ApiError from '../errors/api.erros.js'
 
 class TransactionService {
@@ -8,7 +8,7 @@ class TransactionService {
         const balance = await Balance.findById(id)
 
         if (!balance) {
-            throw ApiError.badRequest('Balance not found!', 400)
+            throw ApiError.badRequest(BALANCE_NOT_FOUND, 400)
         }
 
         return { money: balance?.balance }
@@ -18,7 +18,7 @@ class TransactionService {
         const balance = await Balance.findById(id)
 
         if (!balance) {
-            throw ApiError.badRequest('History not found!', 400)
+            throw ApiError.badRequest(HISTORY_NOT_FOUND, 400)
         }
 
         return balance?.history
@@ -30,11 +30,11 @@ class TransactionService {
         const balance = await Balance.findById(id)
 
         if (balance && Number(balance.balance) + money < 0) {
-            throw ApiError.badRequest('Balance is negative', 400)
+            throw ApiError.badRequest(BALANCE_NEGATIVE, 400)
         }
 
         if (!balance && money < 0) {
-            throw ApiError.badRequest('New user can`t have negative balance', 400)
+            throw ApiError.badRequest(NEW_USER_NEGATIVE, 400)
         }
 
         const updateBalance = await Balance.findOneAndUpdate(
